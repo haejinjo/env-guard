@@ -25,6 +25,10 @@ env-guard is one hook script, `hooks/env-guard.py`, that does three things:
 2. **Hides anything that slips through.** After each action, it loads the values from your project's `.env` files and replaces any it finds in the output with a label like `[REDACTED:API_KEY]`. The assistant only ever sees the label, whichever command printed the value.
 3. **Fails safe.** If the hook can't run (for example, Python is missing), actions are blocked instead of allowed.
 
+![A Claude Code chat. The user asks for an API key from .env. Claude's first command is blocked by env-guard, so it runs a yes/no check instead and reports the key is set without showing its value.](docs/blocked-read.png)
+
+*Asked for the key. Got a yes/no. env-guard blocked the read, then steered Claude to a check that never prints the value.*
+
 Still allowed:
 
 - Checking whether a key is set: `grep -q '^API_KEY=.\+' .env && echo set || echo missing`
