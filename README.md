@@ -38,7 +38,19 @@ The assistant can still check whether a key is set (`grep -q '^API_KEY=.\+' .env
    | **Local** | This project, only for you | You want to try it in one place first |
 
 4. Start a new session. The guard only applies to sessions started after you install it.
-5. To check that it's on, type `/plugin` and look for env-guard marked as enabled. You can turn it off from the same menu.
+
+#### How to know it's working
+
+Run `claude plugin list` in a terminal. You should see:
+
+```
+env-guard@env-guard
+  Version: 0.1.0
+  Scope:   user
+  Status:  ✔ enabled
+```
+
+After that, whenever the assistant tries to read your `.env`, you'll see a message starting with `Blocked by env-guard`. If a key ever shows up in a command's output, the assistant sees `[REDACTED:KEY_NAME]` in its place. To turn it off, open `/plugin` in Claude Code and disable env-guard.
 
 ### Codex
 
@@ -70,10 +82,13 @@ In Codex, ask for the same test after you've approved the hook with `/hooks` and
 
 ## What it doesn't catch
 
-- A value a program rewrote into another form before printing it. It recognizes the original value, plus its base64 and URL-encoded forms.
-- Values shorter than 8 characters, like `3000` or `true`. Hiding every "3000" would break normal output.
-- Secrets stored outside your project's `.env` files.
-- Log files on your machine. The assistant sees the hidden version, but the original output can still be in local logs.
+env-guard catches the worst mistakes. Here's exactly what it doesn't cover:
+
+- **Short values.** Values under 8 characters, like `3000` or `true`, aren't hidden, because hiding every "3000" would break normal output. Real secrets are almost always longer than that.
+- **Secrets outside `.env` files.** It only knows about the `.env` files in your project, like `.env` and `.env.local`. A key stored in `config.json`, or set in your terminal's settings, isn't covered.
+- **Disguised values.** It recognizes a key exactly as written, and in two common encoded forms (base64 and URL encoding). If a program changes the key some other way before printing it, like splitting or reversing it, the guard won't recognize it.
+- **Codex's saved chat history.** In Codex, the AI only sees the hidden version, but Codex still saves the original output in its chat history files on your computer (`~/.codex/sessions`). In our tests, Claude Code saved only the hidden version.
+- **Your own app's logs.** If your program writes a key into its own log file, that file has the real key. env-guard only controls what the AI sees.
 
 ## Test
 

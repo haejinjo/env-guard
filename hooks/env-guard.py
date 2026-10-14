@@ -36,8 +36,10 @@ SAFE_COMMAND = re.compile(r"^\s*(" + "|".join(SAFE_COMMANDS) + ")")
 ENV_FILE_IN_COMMAND = re.compile(r"(?:^|[\s'\"=/<>|;&(`:])((?:[\w-]+)?\.env(?:\.[\w.-]+)?)(?=$|[\s'\";|&)<>`])")
 
 # Commands whose quoted arguments are just text, like a message or a note.
-TEXT_COMMAND = re.compile(r"^\s*(echo|printf|git\s+(-C\s+\S+\s+)?commit)\b")
-PIPES_INTO_SHELL = re.compile(r"\|\s*(bash|sh|zsh|eval|xargs|source)\b")  # turns text back into commands
+TEXT_COMMAND = re.compile(r"^\s*(echo|printf|git\s+(-C\s+\S+\s+)?commit(?!.*\s(-F|--file)\b))\b")  # -F reads a file
+PIPES_INTO_SHELL = re.compile(  # turns text back into commands
+    r"\|\s*(sudo\s+)?(bash|sh|zsh|eval|xargs|source|python3?|node|ruby|perl)\b"
+)
 HEREDOC_START = re.compile(r"(?<!<)<<(?!<)(-?)\s*(['\"]?)(\w+)\2")  # <<EOF, <<-EOF, <<'EOF', not <<<
 SHELL_ON_LINE = re.compile(r"(?:^|[\s|;&(])(bash|sh|zsh)\b")
 QUOTED = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"")
