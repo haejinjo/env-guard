@@ -44,10 +44,6 @@ env-guard is one hook script, `hooks/env-guard.py`, that does three things:
 2. **Hides anything that slips through.** After each action, it loads the values from your project's `.env` files and replaces any it finds in the output with a label like `[REDACTED:API_KEY]`. The assistant only ever sees the label, whichever command printed the value.
 3. **Fails safe.** If the hook can't run (for example, Python is missing), actions are blocked instead of allowed.
 
-![A Claude Code chat. The user asks for an API key from .env. Claude's first command is blocked by env-guard, so it checks whether the key exists instead and reports the key is set without showing its value.](docs/blocked-read.png)
-
-*Asked for an API key in a project's `.env` file. Both a rule in the global `CLAUDE.md` and the env-guard plugin blocked the read, but Claude can still confirm the key exists without ever seeing it.*
-
 Still allowed:
 
 - Checking whether a key is set: `grep -q '^API_KEY=.\+' .env && echo set || echo missing`
@@ -87,6 +83,10 @@ env-guard@env-guard
 ```
 
 After that, whenever the assistant tries to read your `.env`, you'll see a message starting with `Blocked by env-guard`. If a key ever shows up in a command's output, the assistant sees `[REDACTED:KEY_NAME]` in its place. To turn it off, open `/plugin` in Claude Code and disable env-guard.
+
+![A Claude Code chat. The user asks for an API key from .env. Claude's first command is blocked by env-guard, so it checks whether the key exists instead and reports the key is set without showing its value.](docs/blocked-read.png)
+
+*Asked for an API key in a project's `.env` file. Both a rule in the global `CLAUDE.md` and the env-guard plugin blocked the read, but Claude can still confirm the key exists without ever seeing it.*
 
 ### Codex
 
