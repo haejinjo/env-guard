@@ -25,7 +25,7 @@ The assistant can still check whether a key is set (`grep -q '^API_KEY=.\+' .env
 Type this in Claude Code:
 
 ```
-/plugin install env-guard --marketplace OWNER/env-guard
+/plugin install env-guard --marketplace [TBD repo]
 ```
 
 Answer `y` to add the marketplace, then pick a scope. "User" protects every project.
