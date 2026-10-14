@@ -88,6 +88,34 @@ class Before(unittest.TestCase):
         ]:
             self.assertEqual(before(tool, tool_input), "allowed", tool_input)
 
+    def test_allows_text_that_only_mentions_env_files(self):
+        for command in [
+            "python3 -I - README.md <<'EOF'\nNever cat .env; use grep -q instead.\nEOF",
+            "cat > notes.md <<EOF\nCopy .env.example to .env first.\nEOF",
+            "git commit -m \"$(cat <<'EOF'\nStop reading .env in tests\nEOF\n)\"",
+            "echo \"copy .env.example to .env; then run it\"",
+            "printf '%s\\n' 'source .env'",
+            "git commit -m 'Ignore .env | keep .env.example'",
+            "git -C ~/proj commit -m \"Handle .env files\"",
+        ]:
+            self.assertEqual(before("Bash", {"command": command}), "allowed", command)
+
+    def test_still_blocks_reads_hidden_in_text_shapes(self):
+        for command in [
+            "head .env",
+            "head -n 3 .env",
+            "bash <<EOF\ncat .env\nEOF",
+            "cat <<'EOF' | bash\ncat .env\nEOF",
+            "cat <<EOF\n$(cat .env)\nEOF",
+            "echo 'cat .env' | bash",
+            "echo .env | xargs cat",
+            "echo \"$(cat .env)\"",
+            "printf '%s' \"`cat .env`\"",
+            "python3 -c \"print(open('.env').read())\nprint(1)\"",
+            "python3 <<< 'open(\".env\")'",
+        ]:
+            self.assertEqual(before("Bash", {"command": command}), "blocked", command)
+
 
 class After(unittest.TestCase):
     def setUp(self):

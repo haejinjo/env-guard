@@ -35,6 +35,14 @@ SAFE_COMMANDS = [
 SAFE_COMMAND = re.compile(r"^\s*(" + "|".join(SAFE_COMMANDS) + ")")
 ENV_FILE_IN_COMMAND = re.compile(r"(?:^|[\s'\"=/<>|;&(`:])((?:[\w-]+)?\.env(?:\.[\w.-]+)?)(?=$|[\s'\";|&)<>`])")
 
+# Commands whose quoted arguments are just text, like a message or a note.
+TEXT_COMMAND = re.compile(r"^\s*(echo|printf|git\s+(-C\s+\S+\s+)?commit)\b")
+PIPES_INTO_SHELL = re.compile(r"\|\s*(bash|sh|zsh|eval|xargs|source)\b")  # turns text back into commands
+HEREDOC_START = re.compile(r"(?<!<)<<(?!<)(-?)\s*(['\"]?)(\w+)\2")  # <<EOF, <<-EOF, <<'EOF', not <<<
+SHELL_ON_LINE = re.compile(r"(?:^|[\s|;&(])(bash|sh|zsh)\b")
+QUOTED = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"")
+PLACEHOLDER = re.compile(r"\x00(\d+)\x00")
+
 
 # ---------- which files hold secrets ----------
 
@@ -105,6 +113,54 @@ def shell_command(tool_input):
     return str(command)
 
 
+def strip_heredocs(command):
+    """Drop heredoc bodies, except ones a shell will run or expand.
+
+    The body is usually text (a README, a commit message). This also lets
+    `python3 - <<'EOF'` scripts through even if they open .env; the
+    after-tool scrub still redacts any value they print.
+    """
+    lines = command.split("\n")
+    kept = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        kept.append(line)
+        i += 1
+        for dash, quote, delimiter in HEREDOC_START.findall(line):
+            end = re.compile(("\t*" if dash else "") + re.escape(delimiter))
+            body = []
+            while i < len(lines) and not end.fullmatch(lines[i]):
+                body.append(lines[i])
+                i += 1
+            runs = SHELL_ON_LINE.search(line)
+            expands = not quote and any("$(" in b or "`" in b for b in body)
+            if runs or expands:
+                kept.extend(body)
+    return "\n".join(kept)
+
+
+def hide_quotes(command):
+    """Swap each quoted string for a numbered placeholder, so splitting can't cut through it."""
+    quoted = []
+
+    def save(match):
+        quoted.append(match.group())
+        return f"\x00{len(quoted) - 1}\x00"
+
+    return QUOTED.sub(save, command), quoted
+
+
+def restore(part, quoted, drop_text):
+    """Put quoted strings back. With drop_text, leave out the ones that are plain text."""
+    def put_back(match):
+        text = quoted[int(match.group(1))]
+        expands = text.startswith('"') and ("$(" in text or "`" in text)
+        return "''" if drop_text and not expands else text
+
+    return PLACEHOLDER.sub(put_back, part)
+
+
 def check_before(tool, tool_input):
     if tool in ("Read", "Edit", "MultiEdit", "NotebookEdit"):
         path = tool_input.get("file_path") or tool_input.get("notebook_path") or ""
@@ -117,7 +173,10 @@ def check_before(tool, tool_input):
                 block(f"searching inside {target}")
 
     if tool == "Bash":
-        for part in re.split(r"\|\||&&|[;|\n]", shell_command(tool_input)):
+        command, quoted = hide_quotes(strip_heredocs(shell_command(tool_input)))
+        runs_text = bool(PIPES_INTO_SHELL.search(command))
+        for part in re.split(r"\|\||&&|[;|\n]", command):
+            part = restore(part, quoted, drop_text=not runs_text and bool(TEXT_COMMAND.match(part)))
             env_files = [f for f in ENV_FILE_IN_COMMAND.findall(part) if is_secret_file(f)]
             if env_files and not SAFE_COMMAND.match(part):
                 block(f"this command could print the values in {env_files[0]}")
