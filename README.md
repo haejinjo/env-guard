@@ -20,6 +20,18 @@ The assistant can still check whether a key is set (`grep -q '^API_KEY=.\+' .env
 
 ## Install
 
+### Easiest: ask your assistant to do it
+
+Paste one of these as a message. It installs env-guard, proves it works on a fake key, and cleans up after itself.
+
+**Claude Code:**
+
+> Install the env-guard plugin from [TBD repo] for all my projects. Then prove it works without touching my real files: make a temporary folder with a fake .env containing a dummy key, start a fresh Claude session there, and show me that reading the .env gets blocked and the dummy key shows up as [REDACTED]. Delete the temporary folder when you're done.
+
+**Codex:**
+
+> Install env-guard from [TBD repo] by following the Codex section of its README. Tell me when to run /hooks to approve it and restart. After that, prove it works without touching my real files: make a temporary folder with a fake .env containing a dummy key, show me that reading it gets blocked and the key shows up as [REDACTED], then delete the folder.
+
 ### Claude Code
 
 Type this in Claude Code:
