@@ -71,23 +71,6 @@ Still allowed:
 
 2. **Start a new session.** The guard only applies to sessions started after you install it.
 
-#### How to know it's working
-
-Run `claude plugin list` in a terminal. You should see:
-
-```
-env-guard@env-guard
-  Version: 0.1.0
-  Scope:   user
-  Status:  ✔ enabled
-```
-
-After that, whenever the assistant tries to read your `.env`, you'll see a message starting with `Blocked by env-guard`. If a key ever shows up in a command's output, the assistant sees `[REDACTED:KEY_NAME]` in its place. To turn it off, open `/plugin` in Claude Code and disable env-guard.
-
-![A Claude Code chat. The user asks for an API key from .env. Claude's first command is blocked by env-guard, so it checks whether the key exists instead and reports the key is set without showing its value.](docs/blocked-read.png)
-
-*Asked for an API key in a project's `.env` file. Both a rule in the global `CLAUDE.md` and the env-guard plugin blocked the read, but Claude can still confirm the key exists without ever seeing it.*
-
 ### Codex
 
 Codex's command-line app doesn't currently run hooks that come from plugins, so Codex uses a manual install:
@@ -108,7 +91,24 @@ Codex's command-line app doesn't currently run hooks that come from plugins, so 
 
 Requires Python 3.9 or newer.
 
-### Want proof it works?
+## How to know it's working
+
+Run `claude plugin list` in a terminal. You should see:
+
+```
+env-guard@env-guard
+  Version: 0.1.0
+  Scope:   user
+  Status:  ✔ enabled
+```
+
+After that, whenever the assistant tries to read your `.env`, you'll see a message starting with `Blocked by env-guard`. If a key ever shows up in a command's output, the assistant sees `[REDACTED:KEY_NAME]` in its place. To turn it off, open `/plugin` in Claude Code and disable env-guard.
+
+![A Claude Code chat. The user asks for an API key from .env. Claude's first command is blocked by env-guard, so it checks whether the key exists instead and reports the key is set without showing its value.](docs/blocked-read.png)
+
+*Asked for an API key in a project's `.env` file. Both a rule in the global `CLAUDE.md` and the env-guard plugin blocked the read, but Claude can still confirm the key exists without ever seeing it.*
+
+### Want proof?
 
 After installing, paste this into Claude Code. It tests the guard on a fake key in a temporary folder, so your real files are never touched:
 
