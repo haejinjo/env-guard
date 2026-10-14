@@ -20,27 +20,25 @@ The assistant can still check whether a key is set (`grep -q '^API_KEY=.\+' .env
 
 ## Install
 
-### Easiest: ask your assistant to do it
-
-Paste one of these as a message. It installs env-guard, proves it works on a fake key, and cleans up after itself.
-
-**Claude Code:**
-
-> Install the env-guard plugin from [TBD repo] for all my projects. Then prove it works without touching my real files: make a temporary folder with a fake .env containing a dummy key, start a fresh Claude session there, and show me that reading the .env gets blocked and the dummy key shows up as [REDACTED]. Delete the temporary folder when you're done.
-
-**Codex:**
-
-> Install env-guard from [TBD repo] by following the Codex section of its README. Tell me when to run /hooks to approve it and restart. After that, prove it works without touching my real files: make a temporary folder with a fake .env containing a dummy key, show me that reading it gets blocked and the key shows up as [REDACTED], then delete the folder.
-
 ### Claude Code
 
-Type this in Claude Code:
+1. In Claude Code, type:
 
-```
-/plugin install env-guard --marketplace [TBD repo]
-```
+   ```
+   /plugin install env-guard --marketplace [TBD repo]
+   ```
 
-Answer `y` to add the marketplace, then pick a scope. "User" protects every project.
+2. Answer `y` when it asks to add the marketplace. This only tells Claude Code where to download the plugin from.
+3. Choose where it applies:
+
+   | Scope | Protects | Choose it when |
+   |---|---|---|
+   | **User** (recommended) | Every project on your computer | You want it on everywhere, set once |
+   | **Project** | This project, for everyone who works on it | Your whole team should have it. It's saved in the project's shared settings, so teammates get it too |
+   | **Local** | This project, only for you | You want to try it in one place first |
+
+4. Start a new session. The guard only applies to sessions started after you install it.
+5. To check that it's on, type `/plugin` and look for env-guard marked as enabled. You can turn it off from the same menu.
 
 ### Codex
 
@@ -61,6 +59,14 @@ Codex's command-line app doesn't currently run hooks that come from plugins, so 
 3. Type `/hooks` in Codex and approve the new hook, then restart Codex.
 
 Requires Python 3.9 or newer.
+
+### Want proof it works?
+
+After installing, paste this into Claude Code. It tests the guard on a fake key in a temporary folder, so your real files are never touched:
+
+> Prove env-guard works without touching my real files: make a temporary folder with a fake .env containing a dummy key, start a fresh Claude session there, and show me that reading the .env gets blocked and the dummy key shows up as [REDACTED]. Delete the temporary folder when you're done.
+
+In Codex, ask for the same test after you've approved the hook with `/hooks` and restarted.
 
 ## What it doesn't catch
 
