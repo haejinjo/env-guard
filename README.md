@@ -28,7 +28,8 @@ meant to hide secret lines.
 
 Check a key exists:  grep -q '^KEY_NAME=.\+' .env && echo set || echo missing
 List key names:      grep -o '^[A-Za-z_][A-Za-z0-9_]*=' .env
-Need the value? Ask me to paste it.
+Need the real value? Tell me to look it up myself.
+Never ask me to paste it into the chat.
 ```
 
 </details>

@@ -101,7 +101,8 @@ def block(reason):
         "Don't read .env values. To check a key exists: "
         "grep -q '^KEY_NAME=.\\+' .env && echo set || echo missing. "
         "To list key names: grep -o '^[A-Za-z_][A-Za-z0-9_]*=' .env. "
-        "If you need a value, ask the user.",
+        "If the real value is needed, tell the user to look it up themselves "
+        "(for example in their editor), and never ask them to paste it into the chat.",
         file=sys.stderr,
     )
     sys.exit(2)
