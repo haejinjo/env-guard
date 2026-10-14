@@ -15,6 +15,24 @@ A `.env` file is the standard place to store the secret values your code needs, 
 
 You can write "never read the .env" in the assistant's instructions file (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex). But models don't behave the same way every time. The assistant may forget, or run a command that prints the file anyway. For example, a command meant to hide lines containing `TOKEN`, `SECRET` or `KEY` would still print a key named `SOME_COMPANY_NAME_JWT`, because "JWT" isn't on the list.
 
+<details>
+<summary>Of course, it doesn't hurt to steer the model away from it in the first place. Here's a rule you can paste in.</summary>
+
+Add this to your global `~/.claude/CLAUDE.md` (Claude Code) or `~/.codex/AGENTS.md` (Codex), so it applies to every project:
+
+```markdown
+## Never print .env values
+
+Don't read or print .env files, even with a filter
+meant to hide secret lines.
+
+Check a key exists:  grep -q '^KEY_NAME=.\+' .env && echo set || echo missing
+List key names:      grep -o '^[A-Za-z_][A-Za-z0-9_]*=' .env
+Need the value? Ask me to paste it.
+```
+
+</details>
+
 ## How it works
 
 Claude Code and Codex are *harnesses*: the app around the AI model that actually runs its commands and opens its files. A harness can run *hooks*, small programs that run automatically before and after every action the assistant takes. The harness runs them, not the AI, so the AI can't skip them.
