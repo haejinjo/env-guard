@@ -1,0 +1,16 @@
+{
+  "name": "env-guard",
+  "owner": {
+    "name": "Hejin Jo"
+  },
+  "metadata": {
+    "description": "env-guard: keep .env secrets out of AI coding assistants."
+  },
+  "plugins": [
+    {
+      "name": "env-guard",
+      "source": "./",
+      "description": "Keeps .env secret values out of your AI coding assistant: blocks reads and redacts leaked values from output."
+    }
+  ]
+}

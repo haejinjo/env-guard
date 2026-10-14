@@ -1,0 +1,8 @@
+{
+  "name": "env-guard",
+  "version": "0.1.0",
+  "description": "Keeps .env secret values out of your AI coding assistant: blocks reads and redacts leaked values from output.",
+  "author": { "name": "Hejin Jo" },
+  "license": "MIT",
+  "keywords": ["security", "secrets", "dotenv", "hooks"]
+}
