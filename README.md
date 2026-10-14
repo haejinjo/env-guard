@@ -112,7 +112,9 @@ After that, whenever the assistant tries to read your `.env`, you'll see a messa
 
 After installing, paste this into Claude Code. It tests the guard on a fake key in a temporary folder, so your real files are never touched:
 
-> Prove env-guard works without touching my real files: make a temporary folder with a fake .env containing a dummy key, start a fresh Claude session there, and show me that reading the .env gets blocked and the dummy key shows up as [REDACTED]. Delete the temporary folder when you're done.
+```text
+Prove env-guard works without touching my real files: make a temporary folder with a fake .env containing a dummy key, start a fresh Claude session there, and show me that reading the .env gets blocked and the dummy key shows up as [REDACTED]. Delete the temporary folder when you're done.
+```
 
 In Codex, ask for the same test after you've approved the hook with `/hooks` and restarted.
 
