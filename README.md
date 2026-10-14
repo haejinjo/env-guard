@@ -27,7 +27,7 @@ env-guard is one hook script, `hooks/env-guard.py`, that does three things:
 
 ![A Claude Code chat. The user asks for an API key from .env. Claude's first command is blocked by env-guard, so it checks whether the key exists instead and reports the key is set without showing its value.](docs/blocked-read.png)
 
-*Asked for an API key in a project's `.env` file. Both the rule in context and the env-guard plugin blocked the read, but Claude can still confirm the key exists without ever seeing it.*
+*Asked for an API key in a project's `.env` file. Both a rule in the global `CLAUDE.md` and the env-guard plugin blocked the read, but Claude can still confirm the key exists without ever seeing it.*
 
 Still allowed:
 
